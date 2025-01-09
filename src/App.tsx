@@ -1,54 +1,69 @@
 import { useState } from "react";
 import "./App.css";
 
-/**
- * `items` variable is an array of objects with the following structure:
- *
- * [
- *  { id: 0, name: 'Item 1' },
- *  { id: 1, name: 'Item 2' },
- *  { id: 2, name: 'Item 3' },
- * ]
- *
- * Array.from() is used to create an array of 30 items.
- * The second argument of Array.from() is a map function that returns
- * an object with an id and name property.
- */
-const items = Array.from({ length: 30 }, (_, index) => ({
-	id: index,
-	name: `Item ${index + 1}`,
+const items = Array.from({ length: 100 }, (_, index) => ({
+  id: index,
+  name: `Item ${index + 1}`,
 }));
 
-/**
- * `itemsPerPageOptions` is an array of numbers that represent the
- * options for the items per page select element.
- *
- * Sample initial value: [5, 10, 15]
- *
- * This array is used to render the options for the select element.
- */
-const itemsPerPageOptions = [5, 10, 15];
 
-export const PaginationChallenge = () => {
-	/**
-	 * Write your states here
-	 */
+const PaginationChallenge = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-	/**
-	 * Write your event handlers here
-	 */
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = items.slice(startIndex, startIndex + itemsPerPage);
 
-	return (
-		<div className="pagination-challenge">
-			<div className="pagination-controls"></div>
+  const totalPages = Math.ceil(items.length / itemsPerPage);
 
-			<div className="items-per-page">
-				<label>Items per Page:</label>
-			</div>
+  const handlePrevious = () => {
+    setCurrentPage((currentPage) => Math.max(currentPage - 1, 1));
+  };
+  const handleNext = () => {
+    setCurrentPage((currentPage) => Math.min(currentPage + 1, totalPages));
+  };
 
-			<div className="item-list"></div>
-		</div>
-	);
+  const handleItemsPerPageChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setItemsPerPage(parseInt(event.target.value));
+    setCurrentPage(1);
+  };
+
+  return (
+    <div className="pagination-challenge">
+      <h1>Pagination Challenge</h1>
+      <div className="item-list">
+        <ul>
+          {currentItems.map((item) => (
+            <li key={item.id}>{item.name}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="pagination-controls">
+        <button onClick={handlePrevious} disabled={currentPage === 1}>
+          Previous
+        </button>
+        <p>{`Page ${currentPage} of ${totalPages}`}</p>
+        <button onClick={handleNext} disabled={currentPage === totalPages}>
+          Next
+        </button>
+      </div>
+
+      <div className="items-per-page">
+        <label>Items per Page:</label>
+        <select
+          id="itemsPerPage"
+          value={itemsPerPage}
+          onChange={handleItemsPerPageChange}
+        >
+          <option value="5">{itemsPerPage === 5 ? "✔ 5" : "5"}</option>
+          <option value="10">{itemsPerPage === 10 ? "✔ 10" : "10"}</option>
+          <option value="20">{itemsPerPage === 20 ? "✔ 20" : "20"}</option>
+        </select>
+      </div>
+    </div>
+  );
 };
 
 export default PaginationChallenge;
